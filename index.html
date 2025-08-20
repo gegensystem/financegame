@@ -1,1 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Navigator AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .finn-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .decision-btn { transition: all 0.2s ease-in-out; }
+        .decision-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .modal-hidden { display: none; }
+        .chart-line { stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .chart-grid { stroke: #475569; stroke-dasharray: 2 3; stroke-width: 1; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-300">
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+        <div class="max-w-2xl">
+            <h1 class="text-4xl md:text-5xl font-bold text-white">Finance Navigator <span class="finn-gradient text-transparent bg-clip-text">AI</span></h1>
+            <p class="mt-4 text-lg text-slate-400">Make the financial decisions of your life – with an AI mentor by your side. The game progresses in 3-year steps. Your goal: Achieve financial freedom by retirement.</p>
+        </div>
+        <div id="career-choices" class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl"></div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden min-h-screen flex flex-col p-4 md:p-8">
+        <header class="flex justify-between items-center pb-4 border-b border-slate-700">
+            <h1 class="text-2xl font-bold text-white">Finance Navigator <span class="finn-gradient text-transparent bg-clip-text">AI</span></h1>
+            <div class="text-right">
+                <div class="text-sm text-slate-500">Age</div>
+                <div id="player-age" class="text-2xl font-bold text-white"></div>
+            </div>
+        </header>
+
+        <main class="mt-6 flex-grow">
+            <!-- Main Dashboard -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                <div class="md:col-span-2 bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700">
+                    <h3 class="font-bold text-white mb-3">Financial Overview (per year)</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between items-center"><span>Gross Salary</span><span id="db-brutto" class="font-semibold text-white"></span></div>
+                        <div class="flex justify-between items-center text-red-400"><span>- Taxes & Social Contributions</span><span id="db-deductions" class="font-semibold"></span></div>
+                        <hr class="border-slate-600">
+                        <div class="flex justify-between items-center text-green-400 font-bold"><span>= Net Salary</span><span id="db-netto" class="text-lg"></span></div>
+                        <hr class="border-slate-600">
+                        <div class="flex justify-between items-center"><span>- Living Expenses</span><span id="db-expenses" class="font-semibold text-white"></span></div>
+                        <div class="flex justify-between items-center"><span>= Annual Surplus</span><span id="db-surplus" class="font-semibold text-white"></span></div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center"><div class="text-xs text-slate-400">Net Worth</div><div id="db-networth" class="text-lg font-bold text-white"></div></div>
+                    <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center"><div class="text-xs text-slate-400">Pension Account</div><div id="db-pension" class="text-lg font-bold text-white"></div></div>
+                    <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center"><div class="text-xs text-slate-400">Knowledge</div><div id="db-knowledge" class="text-lg font-bold text-white"></div></div>
+                    <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center"><div class="text-xs text-slate-400">Stress</div><div id="db-stress" class="text-lg font-bold text-white"></div></div>
+                </div>
+            </div>
+
+            <!-- Event Area -->
+            <div class="mt-8 bg-slate-800/50 p-6 rounded-xl shadow-lg border border-slate-700">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-full finn-gradient flex items-center justify-center flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                    </div>
+                    <div>
+                        <h2 class="font-bold text-white">FINN <span class="text-sm font-medium text-slate-400">(Your AI Mentor)</span></h2>
+                        <p id="finn-advice" class="mt-1 text-slate-400"></p>
+                    </div>
+                </div>
+                <hr class="my-6 border-slate-700">
+                <div>
+                    <h3 class="font-semibold text-lg text-white">Situation:</h3>
+                    <p id="event-description" class="mt-2 text-slate-300"></p>
+                </div>
+                <div id="decision-buttons" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="negotiation-modal" class="modal-hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-lg p-6">
+            <h2 class="text-2xl font-bold text-white">Salary Negotiation</h2>
+            <p class="mt-2 text-slate-400">Formulate your strongest argument for a salary increase.</p>
+            <textarea id="negotiation-argument" class="mt-4 w-full h-32 p-3 bg-slate-900 border border-slate-600 text-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500" placeholder="e.g., I successfully completed project X..."></textarea>
+            <div id="negotiation-response" class="mt-4 p-4 bg-slate-900/50 rounded-lg hidden"></div>
+            <div class="mt-6 flex gap-4">
+                <button id="submit-negotiation-btn" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50">Submit Argument</button>
+                <button id="close-negotiation-btn" class="w-full bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-slate-700 transition">End Conversation</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-over-modal" class="modal-hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-3xl p-6 text-center">
+            <h2 class="text-3xl font-bold text-white">Retirement Age Reached!</h2>
+            <p class="mt-2 text-slate-400">You are 65. Time to take stock.</p>
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                <div class="bg-slate-900/50 p-4 rounded-lg"><div class="text-sm text-slate-400">Final Net Worth</div><div id="final-networth" class="text-2xl font-bold text-white"></div></div>
+                <div class="bg-slate-900/50 p-4 rounded-lg"><div class="text-sm text-slate-400">Pension Account</div><div id="final-pension" class="text-2xl font-bold text-white"></div></div>
+            </div>
+            <div class="mt-6">
+                <h3 class="font-semibold text-lg text-white">Financial Life Development</h3>
+                <div class="mt-2 h-64 bg-slate-900/50 rounded-lg p-4">
+                    <svg id="history-chart" width="100%" height="100%"></svg>
+                </div>
+                 <div id="chart-legend" class="flex justify-center gap-4 mt-2 text-xs"></div>
+            </div>
+            <div class="mt-8">
+                <button id="restart-game-btn" class="w-full max-w-xs mx-auto bg-slate-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-slate-700 transition">Restart</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="status-message" class="fixed bottom-5 right-5 bg-slate-200 text-slate-900 py-2 px-4 rounded-lg shadow-lg opacity-0 translate-y-4 transition-all duration-300 z-40 font-semibold"></div>
+
+    <script>
+    // --- DOM ELEMENTS ---
+    const DOMElements = {
+        startScreen: document.getElementById('start-screen'),
+        gameScreen: document.getElementById('game-screen'),
+        careerChoices: document.getElementById('career-choices'),
+        playerAge: document.getElementById('player-age'),
+        db: {
+            brutto: document.getElementById('db-brutto'),
+            deductions: document.getElementById('db-deductions'),
+            netto: document.getElementById('db-netto'),
+            expenses: document.getElementById('db-expenses'),
+            surplus: document.getElementById('db-surplus'),
+            networth: document.getElementById('db-networth'),
+            pension: document.getElementById('db-pension'),
+            knowledge: document.getElementById('db-knowledge'),
+            stress: document.getElementById('db-stress'),
+        },
+        finnAdvice: document.getElementById('finn-advice'),
+        eventDescription: document.getElementById('event-description'),
+        decisionButtons: document.getElementById('decision-buttons'),
+        negotiationModal: document.getElementById('negotiation-modal'),
+        negotiationArgument: document.getElementById('negotiation-argument'),
+        negotiationResponse: document.getElementById('negotiation-response'),
+        submitNegotiationBtn: document.getElementById('submit-negotiation-btn'),
+        closeNegotiationBtn: document.getElementById('close-negotiation-btn'),
+        gameOverModal: document.getElementById('game-over-modal'),
+        finalNetworth: document.getElementById('final-networth'),
+        finalPension: document.getElementById('final-pension'),
+        historyChart: document.getElementById('history-chart'),
+        chartLegend: document.getElementById('chart-legend'),
+        restartGameBtn: document.getElementById('restart-game-btn'),
+        statusMessage: document.getElementById('status-message'),
+    };
+
+    let gameState = {};
+
+    const formatCurrency = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(val);
+    const showStatusMessage = (msg, dur = 3000) => {
+        DOMElements.statusMessage.textContent = msg;
+        DOMElements.statusMessage.classList.remove('opacity-0', 'translate-y-4');
+        setTimeout(() => DOMElements.statusMessage.classList.add('opacity-0', 'translate-y-4'), dur);
+    };
+    const toggleModal = (modal, show) => modal.classList.toggle('modal-hidden', !show);
+
+    const careers = {
+        it: { name: "IT Specialist", start: { age: 22, bruttoSalary: 75000, netWorth: 5000, knowledge: 60, stress: 40 } },
+        marketing: { name: "Marketing Manager", start: { age: 23, bruttoSalary: 60000, netWorth: 3000, knowledge: 50, stress: 30 } },
+        trade: { name: "Skilled Worker", start: { age: 20, bruttoSalary: 52000, netWorth: 8000, knowledge: 70, stress: 20 } }
+    };
+
+    const events = [
+        { id: 'start', description: "Your career begins. The next few years will be crucial.", finnAdvice: "Focus on building knowledge and capital. Every decision counts.", options: [{ text: "Let's go!", action: () => handleFirstStep() }] },
+        { id: 'education_offer', condition: gs => gs.knowledge < 85 && !gs.triggeredEvents.includes('education_offer'), description: "Your employer offers a training course. Your cost: $5,000.", finnAdvice: "Education is the best investment. This could significantly improve your salary prospects.", options: [{ text: "Invest", action: () => { gameState.netWorth -= 5000; gameState.knowledge += 15; nextStep(); } }, { text: "Decline", action: () => nextStep() }] },
+        { id: 'salary_negotiation', condition: gs => gs.age > 25, description: "You feel underpaid and are considering asking for a raise.", finnAdvice: "Good arguments are key. Refer to your successes and increased knowledge.", options: [{ text: "Negotiate", action: () => toggleModal(DOMElements.negotiationModal, true) }, { text: "Wait", action: () => { gameState.stress -= 5; nextStep(); } }] },
+        { id: 'work_life_balance', condition: gs => gs.stress > 50 && !gs.triggeredEvents.includes('work_life_balance'), description: "Job stress is getting to you. You are considering reducing your working hours.", finnAdvice: "Less work means less salary and pension, but also a better quality of life. A difficult trade-off.", options: [{ text: "Switch to 80% part-time", action: () => { gameState.workModel = 0.8; gameState.stress -= 20; nextStep(); } }, { text: "Continue full-time", action: () => { gameState.stress += 5; nextStep(); } }] },
+        { id: 'car_purchase', condition: gs => gs.age > 28 && gs.transport.mode === 'public' && gs.netWorth > 30000, description: "Commuting by public transport is becoming tedious. It's time for a car.", finnAdvice: "A car means freedom, but also high costs. Choose wisely between purchase price and running costs.", options: [
+            { text: "Combustion Engine ($25,000)", action: () => { gameState.netWorth -= 25000; gameState.transport = { mode: 'combustion', cost: 450 }; nextStep(); } },
+            { text: "Hybrid ($35,000)", action: () => { gameState.netWorth -= 35000; gameState.transport = { mode: 'hybrid', cost: 300 }; nextStep(); } },
+            { text: "Electric Car ($45,000)", action: () => { gameState.netWorth -= 45000; gameState.transport = { mode: 'electric', cost: 200 }; nextStep(); } },
+            { text: "Stick with public transport", action: () => nextStep() }
+        ]},
+    ];
+
+    function selectCareer(careerId) {
+        gameState = {
+            ...careers[careerId].start,
+            pension: 0,
+            investments: 0,
+            workModel: 1.0,
+            transport: { mode: 'public', cost: 100 },
+            baseLivingCost: 800,
+            rent: 700,
+            history: [],
+            triggeredEvents: [],
+        };
+        DOMElements.startScreen.classList.add('hidden');
+        DOMElements.gameScreen.classList.remove('hidden');
+        updateUI();
+        presentEvent('start');
+    }
+
+    function getAnnualFinancials(gs) {
+        const salary = gs.bruttoSalary * gs.workModel;
+        let deductionRate = 0.30;
+        if (salary > 80000) deductionRate = 0.40;
+        else if (salary > 50000) deductionRate = 0.35;
+        
+        const totalDeductions = salary * deductionRate;
+        const nettoSalary = salary - totalDeductions;
+        const monthlyExpenses = gs.rent + gs.baseLivingCost + gs.transport.cost;
+        const totalExpenses = monthlyExpenses * 12;
+        const surplus = nettoSalary - totalExpenses;
+
+        return { brutto: salary, deductions: totalDeductions, netto: nettoSalary, expenses: totalExpenses, surplus: surplus };
+    }
+
+    function advanceStateByThreeYears() {
+        gameState.bruttoSalary *= 1.06;
+        const annual = getAnnualFinancials(gameState);
+        gameState.netWorth += annual.surplus * 3;
+        const pensionContribution = annual.brutto * 0.15;
+        gameState.pension += pensionContribution * 3;
+        gameState.baseLivingCost *= 1.05;
+        gameState.rent *= 1.04;
+    }
+
+    function updateUI() {
+        const annualFinances = getAnnualFinancials(gameState);
+        
+        DOMElements.playerAge.textContent = gameState.age;
+        DOMElements.db.brutto.textContent = formatCurrency(annualFinances.brutto);
+        DOMElements.db.deductions.textContent = formatCurrency(annualFinances.deductions);
+        DOMElements.db.netto.textContent = formatCurrency(annualFinances.netto);
+        DOMElements.db.expenses.textContent = formatCurrency(annualFinances.expenses);
+        DOMElements.db.surplus.textContent = formatCurrency(annualFinances.surplus);
+
+        DOMElements.db.networth.textContent = formatCurrency(gameState.netWorth);
+        DOMElements.db.pension.textContent = formatCurrency(gameState.pension);
+        DOMElements.db.knowledge.textContent = gameState.knowledge;
+        DOMElements.db.stress.textContent = gameState.stress;
+    }
+
+    function presentEvent(eventId) {
+        const event = events.find(e => e.id === eventId);
+        DOMElements.finnAdvice.textContent = event.finnAdvice;
+        DOMElements.eventDescription.textContent = event.description;
+        
+        DOMElements.decisionButtons.innerHTML = '';
+        event.options.forEach(option => {
+            const button = document.createElement('button');
+            button.textContent = option.text;
+            button.className = "w-full text-left p-4 bg-slate-700 hover:bg-slate-600 rounded-lg font-semibold text-white decision-btn";
+            button.onclick = option.action;
+            DOMElements.decisionButtons.appendChild(button);
+        });
+        if (!gameState.triggeredEvents.includes(eventId)) {
+            gameState.triggeredEvents.push(eventId);
+        }
+    }
+
+    function handleFirstStep() {
+        const initialFinancials = getAnnualFinancials(gameState);
+        gameState.history.push({
+            age: gameState.age,
+            income: initialFinancials.brutto,
+            pension: gameState.pension,
+            expenses: initialFinancials.expenses
+        });
+        nextStep();
+    }
+
+    function nextStep() {
+        if (gameState.age >= 65) {
+            endGame();
+            return;
+        }
+
+        advanceStateByThreeYears();
+        gameState.age += 3;
+        updateUI();
+
+        const availableEvents = events.filter(e => e.id !== 'start' && (!e.condition || e.condition(gameState)));
+        const nextEvent = availableEvents.length > 0 ? availableEvents[Math.floor(Math.random() * availableEvents.length)] : events.find(e => e.id === 'salary_negotiation');
+        
+        setTimeout(() => {
+            if (gameState.age < 65) {
+                presentEvent(nextEvent.id);
+            } else {
+                endGame();
+            }
+        }, 500);
+    }
+
+    function endGame() {
+        DOMElements.decisionButtons.innerHTML = '<p class="text-center text-slate-400">The game is over. See your results below.</p>';
+        DOMElements.finalNetworth.textContent = formatCurrency(gameState.netWorth);
+        DOMElements.finalPension.textContent = formatCurrency(gameState.pension);
+        drawChart();
+        toggleModal(DOMElements.gameOverModal, true);
+    }
+
+    function drawChart() {
+        const chart = DOMElements.historyChart;
+        const legend = DOMElements.chartLegend;
+        chart.innerHTML = '';
+        legend.innerHTML = '';
+        if (gameState.history.length < 1) return;
+
+        const data = gameState.history;
+        const width = chart.clientWidth;
+        const height = chart.clientHeight;
+        const padding = { top: 10, right: 10, bottom: 20, left: 60 };
+
+        const maxValue = Math.max(...data.flatMap(d => [d.income, d.pension, d.expenses]));
+        const minAge = data[0].age, maxAge = data[data.length - 1].age;
+
+        const xScale = (age) => padding.left + (age - minAge) / (maxAge - minAge) * (width - padding.left - padding.right);
+        const yScale = (value) => (height - padding.bottom) - (value / maxValue) * (height - padding.top - padding.bottom);
+
+        for (let i = 0; i <= 4; i++) {
+            const y = padding.top + i * (height - padding.top - padding.bottom) / 4;
+            const value = maxValue * (1 - i / 4);
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute('x1', padding.left); line.setAttribute('y1', y);
+            line.setAttribute('x2', width - padding.right); line.setAttribute('y2', y);
+            line.setAttribute('class', 'chart-grid');
+            chart.appendChild(line);
+            
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute('x', padding.left - 10); text.setAttribute('y', y + 4);
+            text.setAttribute('fill', '#94a3b8'); text.setAttribute('font-size', '10');
+            text.setAttribute('text-anchor', 'end');
+            text.textContent = `${Math.round(value / 1000)}k`;
+            chart.appendChild(text);
+        }
+
+        const datasets = [
+            { key: 'income', color: '#6366f1', name: 'Income' },
+            { key: 'pension', color: '#34d399', name: 'Pension Account' },
+            { key: 'expenses', color: '#f87171', name: 'Expenses' }
+        ];
+
+        datasets.forEach(ds => {
+            const pathData = "M" + data.map(point => `${xScale(point.age)},${yScale(point[ds.key])}`).join(" L");
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute("d", pathData);
+            path.setAttribute("class", "chart-line");
+            path.setAttribute("stroke", ds.color);
+            chart.appendChild(path);
+
+            legend.innerHTML += `<div class="flex items-center gap-2"><div class="w-3 h-3 rounded-sm" style="background-color: ${ds.color}"></div><span>${ds.name}</span></div>`;
+        });
+    }
+
+    function init() {
+        Object.keys(careers).forEach(key => {
+            const career = careers[key];
+            const card = document.createElement('div');
+            card.className = "bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700 cursor-pointer hover:border-indigo-500 transition-all";
+            card.innerHTML = `<h3 class="text-xl font-bold text-white">${career.name}</h3>`;
+            card.onclick = () => selectCareer(key);
+            DOMElements.careerChoices.appendChild(card);
+        });
+
+        DOMElements.closeNegotiationBtn.onclick = () => {
+            toggleModal(DOMElements.negotiationModal, false);
+            nextStep();
+        };
+        DOMElements.restartGameBtn.onclick = () => window.location.reload();
+    }
+
+    init();
+    </script>
+</body>
+</html>
 
