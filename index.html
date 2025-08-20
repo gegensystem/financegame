@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,315 +9,247 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .finn-gradient {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .decision-btn {
-            transition: all 0.2s ease-in-out;
-        }
-        .decision-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .finn-gradient { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .decision-btn { transition: all 0.2s ease-in-out; }
+        .decision-btn:hover { transform: translateY(-2px); }
+        .modal-hidden { display: none; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-slate-900 text-slate-300">
 
-    <div id="start-screen" class="min-h-screen flex flex-col items-center justify-center p-4">
-        <div class="text-center max-w-2xl">
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">Karriere-Navigator <span class="finn-gradient text-transparent bg-clip-text">AI</span></h1>
-            <p class="mt-4 text-lg text-slate-600">Triff die Finanzentscheidungen deines Lebens – mit einem KI-Mentor an deiner Seite. Dein Ziel: Erreiche finanzielle Freiheit bis zur Pension. Wähle deine Laufbahn, um zu beginnen.</p>
+    <!-- Start Screen -->
+    <div id="start-screen" class="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+        <div class="max-w-2xl">
+            <h1 class="text-4xl md:text-5xl font-bold text-white">Karriere-Navigator <span class="finn-gradient text-transparent bg-clip-text">AI</span></h1>
+            <p class="mt-4 text-lg text-slate-400">Triff die Finanzentscheidungen deines Lebens – mit einem KI-Mentor an deiner Seite. Das Spiel läuft in 3-Jahres-Schritten. Dein Ziel: Erreiche finanzielle Freiheit bis zur Pension.</p>
         </div>
-        <div id="career-choices" class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
-            <!-- Career options will be injected here by JS -->
-        </div>
+        <div id="career-choices" class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl"></div>
     </div>
 
+    <!-- Game Screen -->
     <div id="game-screen" class="hidden min-h-screen flex flex-col p-4 md:p-8">
-        <!-- Header -->
-        <header class="flex justify-between items-center pb-4 border-b border-slate-200">
-            <h1 class="text-2xl font-bold text-slate-900">Karriere-Navigator <span class="finn-gradient text-transparent bg-clip-text">AI</span></h1>
+        <header class="flex justify-between items-center pb-4 border-b border-slate-700">
+            <h1 class="text-2xl font-bold text-white">Karriere-Navigator <span class="finn-gradient text-transparent bg-clip-text">AI</span></h1>
             <div class="text-right">
                 <div class="text-sm text-slate-500">Alter</div>
-                <div id="player-age" class="text-2xl font-bold">22</div>
+                <div id="player-age" class="text-2xl font-bold text-white"></div>
             </div>
         </header>
 
-        <!-- Dashboard -->
         <main class="mt-6 flex-grow">
+            <!-- Simplified Dashboard -->
             <div id="dashboard" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                 <!-- Dashboard items will be injected here -->
             </div>
 
-            <!-- Event & Decisions -->
-            <div class="mt-8 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <!-- FINN, the AI Mentor -->
+            <!-- Event Area -->
+            <div class="mt-8 bg-slate-800/50 p-6 rounded-xl shadow-lg border border-slate-700">
                 <div class="flex items-start gap-4">
                     <div class="w-12 h-12 rounded-full finn-gradient flex items-center justify-center flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
                     </div>
                     <div>
-                        <h2 class="font-bold text-slate-900">FINN <span class="text-sm font-medium text-slate-500">(Dein KI-Mentor)</span></h2>
-                        <p id="finn-advice" class="mt-1 text-slate-600">Willkommen! Deine Karriere beginnt jetzt. Jede Entscheidung zählt.</p>
+                        <h2 class="font-bold text-white">FINN <span class="text-sm font-medium text-slate-400">(Dein KI-Mentor)</span></h2>
+                        <p id="finn-advice" class="mt-1 text-slate-400"></p>
                     </div>
                 </div>
-
-                <hr class="my-6 border-slate-200">
-
-                <!-- Event Description -->
+                <hr class="my-6 border-slate-700">
                 <div>
-                    <h3 class="font-semibold text-lg">Situation:</h3>
-                    <p id="event-description" class="mt-2 text-slate-700">Du hast deinen ersten Job angetreten. Herzlichen Glückwunsch!</p>
+                    <h3 class="font-semibold text-lg text-white">Situation:</h3>
+                    <p id="event-description" class="mt-2 text-slate-300"></p>
                 </div>
-
-                <!-- Decision Buttons -->
-                <div id="decision-buttons" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Decision buttons will be injected here -->
-                </div>
+                <div id="decision-buttons" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
         </main>
-        
-        <!-- Status Message -->
-        <div id="status-message" class="fixed bottom-5 right-5 bg-slate-900 text-white py-2 px-4 rounded-lg shadow-lg opacity-0 translate-y-4 transition-all duration-300"></div>
-
     </div>
 
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="modal-hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl shadow-2xl w-full max-w-md p-6 text-center">
+            <h2 class="text-3xl font-bold text-white">Pensionsalter erreicht!</h2>
+            <p class="mt-2 text-slate-400">Du bist <span id="final-age"></span>. Zeit, Bilanz zu ziehen.</p>
+            <div class="mt-6 bg-slate-900/50 p-4 rounded-lg">
+                <div class="text-sm text-slate-400">Finales Nettovermögen</div>
+                <div id="final-networth" class="text-3xl font-bold text-white"></div>
+            </div>
+            <div class="mt-8">
+                <button id="restart-game-btn" class="w-full max-w-xs mx-auto bg-slate-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-slate-700 transition">Neu starten</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="status-message" class="fixed bottom-5 right-5 bg-slate-200 text-slate-900 py-2 px-4 rounded-lg shadow-lg opacity-0 translate-y-4 transition-all duration-300 z-40 font-semibold"></div>
+
     <script>
-        // --- DOM ELEMENTS ---
-        const startScreen = document.getElementById('start-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const careerChoicesContainer = document.getElementById('career-choices');
-        const dashboardContainer = document.getElementById('dashboard');
-        const playerAgeEl = document.getElementById('player-age');
-        const finnAdviceEl = document.getElementById('finn-advice');
-        const eventDescriptionEl = document.getElementById('event-description');
-        const decisionButtonsContainer = document.getElementById('decision-buttons');
-        const statusMessageEl = document.getElementById('status-message');
+    const DOMElements = {
+        startScreen: document.getElementById('start-screen'),
+        gameScreen: document.getElementById('game-screen'),
+        careerChoices: document.getElementById('career-choices'),
+        playerAge: document.getElementById('player-age'),
+        dashboard: document.getElementById('dashboard'),
+        finnAdvice: document.getElementById('finn-advice'),
+        eventDescription: document.getElementById('event-description'),
+        decisionButtons: document.getElementById('decision-buttons'),
+        gameOverModal: document.getElementById('game-over-modal'),
+        finalAge: document.getElementById('final-age'),
+        finalNetworth: document.getElementById('final-networth'),
+        restartGameBtn: document.getElementById('restart-game-btn'),
+        statusMessage: document.getElementById('status-message'),
+    };
 
-        // --- GAME STATE ---
-        let gameState = {};
+    let gameState = {};
 
-        // --- HELPER FUNCTIONS ---
-        const formatCurrency = (value) => {
-            return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
-        };
-        
-        const showStatusMessage = (message, duration = 3000) => {
-            statusMessageEl.textContent = message;
-            statusMessageEl.classList.remove('opacity-0', 'translate-y-4');
-            setTimeout(() => {
-                statusMessageEl.classList.add('opacity-0', 'translate-y-4');
-            }, duration);
-        };
+    const formatCurrency = (val) => new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(val);
+    const showStatusMessage = (msg, dur = 3000) => {
+        DOMElements.statusMessage.textContent = msg;
+        DOMElements.statusMessage.classList.remove('opacity-0', 'translate-y-4');
+        setTimeout(() => DOMElements.statusMessage.classList.add('opacity-0', 'translate-y-4'), dur);
+    };
+    const toggleModal = (modal, show) => modal.classList.toggle('modal-hidden', !show);
 
-        // --- CAREER & EVENT DATA ---
-        const careers = {
-            it: {
-                name: "IT-Spezialist/in",
-                description: "Hohes Einstiegsgehalt und grosses Wachstumspotenzial, aber auch ein tendenziell höheres Stresslevel.",
-                start: { age: 22, salary: 65000, netWorth: 5000, pension: 0, knowledge: 60, stress: 40 }
-            },
-            marketing: {
-                name: "Marketing-Manager/in",
-                description: "Gutes Gehalt mit starken Entwicklungschancen durch Networking und Kreativität.",
-                start: { age: 23, salary: 55000, netWorth: 3000, pension: 0, knowledge: 50, stress: 30 }
-            },
-            trade: {
-                name: "Facharbeiter/in (Gewerbe)",
-                description: "Solides Gehalt, stabile Entwicklung und gute Sozialleistungen. Geringeres Stresslevel.",
-                start: { age: 20, salary: 48000, netWorth: 8000, pension: 2000, knowledge: 70, stress: 20 }
-            }
-        };
+    const careers = {
+        it: { name: "IT-Spezialist/in", start: { age: 22, salary: 65000, netWorth: 5000, knowledge: 60, stress: 40 } },
+        marketing: { name: "Marketing-Manager/in", start: { age: 23, salary: 55000, netWorth: 3000, knowledge: 50, stress: 30 } },
+        trade: { name: "Facharbeiter/in", start: { age: 20, salary: 48000, netWorth: 8000, knowledge: 70, stress: 20 } }
+    };
 
-        const events = [
-            {
-                id: 'start',
-                description: "Du hast deinen ersten Job angetreten und erhältst deine erste Gehaltsabrechnung. Sie ist komplizierter als gedacht.",
-                finnAdvice: "Ein Blick auf die Details lohnt sich. Das Verständnis von Brutto vs. Netto ist der erste Schritt zur Finanzkompetenz.",
-                options: [
-                    { text: "Okay, weiter geht's!", action: () => nextYear() }
-                ]
-            },
-            {
-                id: 'first_investment',
-                description: "Du hast etwas Geld gespart. Nun stellt sich die Frage: Was tust du damit?",
-                finnAdvice: "Der frühe Beginn des Investierens ist entscheidend für den Zinseszinseffekt. Selbst kleine Beträge machen über die Zeit einen grossen Unterschied.",
-                options: [
-                    { text: "Auf dem Girokonto lassen (Sicher)", action: () => { gameState.stress -= 5; showStatusMessage("Das Geld ist sicher, aber die Inflation nagt daran."); nextYear(); } },
-                    { text: "In einen globalen ETF investieren (Ausgewogen)", action: () => { gameState.investments = (gameState.investments || 0) + 2000; gameState.netWorth -= 2000; gameState.knowledge += 5; showStatusMessage("Gute Wahl! Dein Geld arbeitet jetzt für dich."); nextYear(); } },
-                    { text: "In eine 'heisse' Tech-Aktie stecken (Riskant)", action: () => { 
-                        const win = Math.random() > 0.4; // 60% chance to win
-                        if (win) {
-                            gameState.netWorth += 3000;
-                            showStatusMessage("Glückwunsch! Die Aktie ist durch die Decke gegangen.", 4000);
-                        } else {
-                            gameState.netWorth -= 1500;
-                            showStatusMessage("Oje, die Aktie ist gefallen. Eine teure Lektion.", 4000);
-                        }
-                        gameState.stress += 10;
-                        nextYear();
-                    }}
-                ]
-            },
-            {
-                id: 'education_offer',
-                description: "Dein Arbeitgeber bietet an, 50% der Kosten für eine relevante Weiterbildung zu übernehmen. Die Kosten für dich wären 2.500 €.",
-                finnAdvice: "Investitionen in dein eigenes Wissen zahlen die besten Zinsen. Das kann sich in zukünftigen Gehaltsverhandlungen auszahlen.",
-                options: [
-                    { text: "Angebot annehmen (2.500 € investieren)", action: () => { gameState.netWorth -= 2500; gameState.knowledge += 15; showStatusMessage("Wissens-Upgrade erfolgreich!"); nextYear(); } },
-                    { text: "Ablehnen (Geld sparen)", action: () => { showStatusMessage("Verständlich, aber eine verpasste Chance?"); nextYear(); } }
-                ]
-            },
-            {
-                id: 'salary_negotiation_chance',
-                description: "Du hast das Gefühl, dass deine Leistung eine Gehaltserhöhung rechtfertigt. Es ist Zeit für ein Gespräch mit deinem Vorgesetzten.",
-                finnAdvice: "Eine gute Vorbereitung ist alles. Deine Chancen steigen mit deinem Wissenslevel. Viel Erfolg!",
-                options: [
-                    { text: "Verhandlung wagen", action: () => {
-                        const successChance = gameState.knowledge / 100; // 75 knowledge = 75% chance
-                        if (Math.random() < successChance) {
-                            const raise = Math.round((gameState.salary * (0.05 + Math.random() * 0.05)) / 1000) * 1000; // 5-10% raise
-                            gameState.salary += raise;
-                            showStatusMessage(`Erfolg! ${formatCurrency(raise)} mehr Gehalt pro Jahr!`, 4000);
-                        } else {
-                            gameState.stress += 5;
-                            showStatusMessage("Leider hat es nicht geklappt. Nächstes Mal!", 4000);
-                        }
-                        nextYear();
-                    }},
-                    { text: "Noch ein Jahr warten", action: () => { gameState.stress -= 5; showStatusMessage("Manchmal ist Geduld eine Tugend."); nextYear(); } }
-                ]
-            },
-            {
-                id: 'random_life_event',
-                description: "Das Leben passiert! Ein unerwartetes Ereignis tritt ein.",
-                finnAdvice: "Finanzielle Puffer sind für solche Momente entscheidend. Mal sehen, wie es dich trifft.",
-                options: [
-                    { text: "Was ist passiert?", action: () => {
-                        const events = [
-                            { msg: "Du erhältst eine Steuerrückzahlung!", effect: () => gameState.netWorth += 1500 },
-                            { msg: "Dein Laptop gibt den Geist auf. Ersatz kostet 1.200 €.", effect: () => gameState.netWorth -= 1200 },
-                            { msg: "Du gewinnst 500 € bei einem Wettbewerb.", effect: () => gameState.netWorth += 500 },
-                            { msg: "Eine teure Zahnarztrechnung flattert ins Haus: 800 €.", effect: () => gameState.netWorth -= 800 },
-                        ];
-                        const randomEvent = events[Math.floor(Math.random() * events.length)];
-                        randomEvent.effect();
-                        showStatusMessage(randomEvent.msg, 4000);
-                        nextYear();
-                    }}
-                ]
-            }
-        ];
-        
-        // --- GAME LOGIC ---
-        function selectCareer(careerId) {
-            const careerData = careers[careerId];
-            gameState = { ...careerData.start, career: careerId, investments: 0 };
-            
-            startScreen.classList.add('hidden');
-            gameScreen.classList.remove('hidden');
-            
-            updateUI();
-            presentEvent('start');
-        }
-
-        function updateUI() {
-            // Dashboard
-            const metrics = [
-                { label: "Nettovermögen", value: formatCurrency(gameState.netWorth + (gameState.investments || 0)), icon: '💰' },
-                { label: "Jahresgehalt (Brutto)", value: formatCurrency(gameState.salary), icon: '💼' },
-                { label: "Wissen/Fähigkeiten", value: gameState.knowledge, icon: '🧠' },
-                { label: "Stresslevel", value: gameState.stress, icon: '🧘' }
-            ];
-            dashboardContainer.innerHTML = metrics.map(m => `
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">${m.icon}</span>
-                        <div>
-                            <div class="text-sm text-slate-500">${m.label}</div>
-                            <div class="text-xl font-bold text-slate-900">${m.value}</div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-
-            // Age
-            playerAgeEl.textContent = gameState.age;
-        }
-        
-        function presentEvent(eventId) {
-            const event = events.find(e => e.id === eventId);
-            if (!event) {
-                console.error(`Event with id ${eventId} not found!`);
-                return;
-            }
-            
-            finnAdviceEl.textContent = event.finnAdvice;
-            eventDescriptionEl.textContent = event.description;
-            
-            decisionButtonsContainer.innerHTML = '';
-            event.options.forEach(option => {
-                const button = document.createElement('button');
-                button.textContent = option.text;
-                button.className = "w-full text-left p-4 bg-slate-100 hover:bg-slate-200 rounded-lg font-semibold decision-btn";
-                button.onclick = option.action;
-                decisionButtonsContainer.appendChild(button);
-            });
-        }
-
-        function nextYear() {
-            // Annual calculations
-            gameState.age++;
-            const netIncome = gameState.salary * 0.65; // Simplified net calculation
-            gameState.netWorth += netIncome - (gameState.salary * 0.3); // Simplified living costs
-            gameState.pension += gameState.salary * 0.05; // Simplified pension contribution
-            
-            // Investment growth/loss
-            if (gameState.investments > 0) {
-                const growth = (Math.random() * 0.15) - 0.03; // -3% to +12% annual return
-                const growthAmount = Math.round(gameState.investments * growth);
-                gameState.investments += growthAmount;
-                if (growthAmount > 0) {
-                    showStatusMessage(`Deine Investments sind um ${formatCurrency(growthAmount)} gewachsen.`);
+    const events = [
+        { id: 'start', description: "Du hast deinen ersten Job angetreten. Herzlichen Glückwunsch!", finnAdvice: "Willkommen! Deine Karriere beginnt jetzt. Jede Entscheidung zählt.", options: [{ text: "Okay, weiter geht's!", action: () => nextStep() }] },
+        { id: 'first_investment', description: "Du hast etwas Geld gespart. Nun stellt sich die Frage: Was tust du damit?", finnAdvice: "Der frühe Beginn des Investierens ist entscheidend für den Zinseszinseffekt.", options: [
+            { text: "Auf dem Girokonto lassen", action: () => { gameState.stress -= 5; showStatusMessage("Das Geld ist sicher, aber die Inflation nagt daran."); nextStep(); } },
+            { text: "In einen globalen ETF investieren", action: () => { gameState.investments = (gameState.investments || 0) + 5000; gameState.netWorth -= 5000; gameState.knowledge += 5; showStatusMessage("Gute Wahl! Dein Geld arbeitet jetzt für dich."); nextStep(); } },
+        ]},
+        { id: 'education_offer', description: "Dein Arbeitgeber bietet an, 50% der Kosten für eine relevante Weiterbildung zu übernehmen. Die Kosten für dich wären 2.500 €.", finnAdvice: "Investitionen in dein eigenes Wissen zahlen die besten Zinsen.", options: [
+            { text: "Angebot annehmen (2.500 €)", action: () => { gameState.netWorth -= 2500; gameState.knowledge += 15; showStatusMessage("Wissens-Upgrade erfolgreich!"); nextStep(); } },
+            { text: "Ablehnen (Geld sparen)", action: () => { showStatusMessage("Verständlich, aber eine verpasste Chance?"); nextStep(); } }
+        ]},
+        { id: 'salary_negotiation_chance', description: "Du hast das Gefühl, dass deine Leistung eine Gehaltserhöhung rechtfertigt.", finnAdvice: "Eine gute Vorbereitung ist alles. Deine Chancen steigen mit deinem Wissenslevel.", options: [
+            { text: "Verhandlung wagen", action: () => {
+                const successChance = gameState.knowledge / 100;
+                if (Math.random() < successChance) {
+                    const raise = Math.round((gameState.salary * (0.05 + Math.random() * 0.05)) / 1000) * 1000;
+                    gameState.salary += raise;
+                    showStatusMessage(`Erfolg! ${formatCurrency(raise)} mehr Gehalt pro Jahr!`, 4000);
                 } else {
-                    showStatusMessage(`Deine Investments sind um ${formatCurrency(growthAmount)} gefallen.`);
+                    gameState.stress += 5;
+                    showStatusMessage("Leider hat es nicht geklappt. Nächstes Mal!", 4000);
                 }
+                nextStep();
+            }},
+            { text: "Noch ein paar Jahre warten", action: () => { gameState.stress -= 5; showStatusMessage("Manchmal ist Geduld eine Tugend."); nextStep(); } }
+        ]},
+        { id: 'retirement_choice', description: "Du hast das Pensionsalter von 65 Jahren erreicht. Du kannst jetzt in den wohlverdienten Ruhestand gehen oder noch ein paar Jahre weiterarbeiten, um dein Vermögen und deine Pension zu erhöhen.", finnAdvice: "Weiterzuarbeiten kann finanziell sehr lohnend sein, aber vergiss nicht auf deine Work-Life-Balance. Die Entscheidung liegt bei dir.", options: [
+            { text: "In Pension gehen", action: () => endGame() },
+            { text: "Weiterarbeiten (3 Jahre)", action: () => nextStep() }
+        ]}
+    ];
+
+    function selectCareer(careerId) {
+        gameState = { ...careers[careerId].start, investments: 0, pension: 0 };
+        DOMElements.startScreen.classList.add('hidden');
+        DOMElements.gameScreen.classList.remove('hidden');
+        updateUI();
+        presentEvent('start');
+    }
+
+    function updateUI() {
+        const totalNetWorth = gameState.netWorth + (gameState.investments || 0);
+        const metrics = [
+            { label: "Nettovermögen", value: formatCurrency(totalNetWorth), icon: '💰' },
+            { label: "Jahresgehalt", value: formatCurrency(gameState.salary), icon: '💼' },
+            { label: "Wissen", value: gameState.knowledge, icon: '🧠' },
+            { label: "Stress", value: gameState.stress, icon: '🧘' }
+        ];
+        DOMElements.dashboard.innerHTML = metrics.map(m => `
+            <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-center">
+                <div class="text-2xl">${m.icon}</div>
+                <div class="text-xs text-slate-400 mt-1">${m.label}</div>
+                <div class="text-lg font-bold text-white">${m.value}</div>
+            </div>
+        `).join('');
+        DOMElements.playerAge.textContent = gameState.age;
+    }
+
+    function presentEvent(eventId) {
+        const event = events.find(e => e.id === eventId);
+        DOMElements.finnAdvice.textContent = event.finnAdvice;
+        DOMElements.eventDescription.textContent = event.description;
+        
+        DOMElements.decisionButtons.innerHTML = '';
+        event.options.forEach(option => {
+            const button = document.createElement('button');
+            button.textContent = option.text;
+            button.className = "w-full text-left p-4 bg-slate-700 hover:bg-slate-600 rounded-lg font-semibold text-white decision-btn";
+            button.onclick = option.action;
+            DOMElements.decisionButtons.appendChild(button);
+        });
+    }
+
+    function nextStep() {
+        if (gameState.age >= 68) {
+            endGame();
+            return;
+        }
+
+        if (gameState.age >= 65) {
+            presentEvent('retirement_choice');
+            return;
+        }
+
+        // Calculations for 3 years
+        const years = 3;
+        gameState.age += years;
+        
+        for (let i = 0; i < years; i++) {
+            const netIncome = gameState.salary * 0.65;
+            const livingCosts = gameState.salary * 0.4;
+            gameState.netWorth += netIncome - livingCosts;
+            gameState.pension += gameState.salary * 0.05;
+            
+            if (gameState.investments > 0) {
+                const growth = (Math.random() * 0.15) - 0.03;
+                gameState.investments *= (1 + growth);
             }
-            
-            // Randomly select next event
-            const availableEvents = events.filter(e => e.id !== 'start');
-            const nextEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)];
-            
-            updateUI();
-            
-            // Add a small delay for game flow
-            setTimeout(() => {
+            // Small salary increase each year
+            gameState.salary *= 1.02;
+        }
+
+        const availableEvents = events.filter(e => e.id !== 'start' && e.id !== 'retirement_choice');
+        const nextEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)];
+        
+        updateUI();
+        
+        setTimeout(() => {
+            // Check again after calculations in case age is now >= 65
+            if (gameState.age >= 65) {
+                presentEvent('retirement_choice');
+            } else {
                 presentEvent(nextEvent.id);
-            }, 1000);
-        }
+            }
+        }, 500);
+    }
 
-        // --- INITIALIZATION ---
-        function init() {
-            // Create career choice buttons
-            Object.keys(careers).forEach(key => {
-                const career = careers[key];
-                const card = document.createElement('div');
-                card.className = "bg-white p-6 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-indigo-500 hover:shadow-md transition-all";
-                card.innerHTML = `
-                    <h3 class="text-xl font-bold text-slate-900">${career.name}</h3>
-                    <p class="mt-2 text-slate-600">${career.description}</p>
-                `;
-                card.onclick = () => selectCareer(key);
-                careerChoicesContainer.appendChild(card);
-            });
-        }
+    function endGame() {
+        const totalNetWorth = gameState.netWorth + (gameState.investments || 0);
+        DOMElements.finalAge.textContent = gameState.age;
+        DOMElements.finalNetworth.textContent = formatCurrency(totalNetWorth);
+        toggleModal(DOMElements.gameOverModal, true);
+    }
 
-        init();
+    function init() {
+        Object.keys(careers).forEach(key => {
+            const career = careers[key];
+            const card = document.createElement('div');
+            card.className = "bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-700 cursor-pointer hover:border-indigo-500 transition-all";
+            card.innerHTML = `<h3 class="text-xl font-bold text-white">${career.name}</h3>`;
+            card.onclick = () => selectCareer(key);
+            DOMElements.careerChoices.appendChild(card);
+        });
+        DOMElements.restartGameBtn.onclick = () => window.location.reload();
+    }
+
+    init();
     </script>
 </body>
 </html>
