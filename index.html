@@ -187,46 +187,52 @@
     }
 
     function nextStep() {
+        // Mandatory retirement check
         if (gameState.age >= 68) {
             endGame();
             return;
         }
 
+        // Flexible retirement check
         if (gameState.age >= 65) {
             presentEvent('retirement_choice');
             return;
         }
 
-        // Calculations for 3 years
-        const years = 3;
-        gameState.age += years;
-        
-        for (let i = 0; i < years; i++) {
+        // --- NEW: Game logic for 3 years ---
+        const years_to_advance = 3;
+        for (let i = 0; i < years_to_advance; i++) {
+            // Annual calculations
             const netIncome = gameState.salary * 0.65;
             const livingCosts = gameState.salary * 0.4;
             gameState.netWorth += netIncome - livingCosts;
             gameState.pension += gameState.salary * 0.05;
             
             if (gameState.investments > 0) {
-                const growth = (Math.random() * 0.15) - 0.03;
+                const growth = (Math.random() * 0.15) - 0.03; // -3% to +12%
                 gameState.investments *= (1 + growth);
             }
-            // Small salary increase each year
+            // Small automatic salary increase each year
             gameState.salary *= 1.02;
         }
+        gameState.age += years_to_advance;
+        // --- END of 3-year logic ---
 
+        // Check again for retirement after advancing age
+        if (gameState.age >= 65) {
+            updateUI();
+            presentEvent('retirement_choice');
+            return;
+        }
+
+        // Present a random event
         const availableEvents = events.filter(e => e.id !== 'start' && e.id !== 'retirement_choice');
         const nextEvent = availableEvents[Math.floor(Math.random() * availableEvents.length)];
         
         updateUI();
         
         setTimeout(() => {
-            // Check again after calculations in case age is now >= 65
-            if (gameState.age >= 65) {
-                presentEvent('retirement_choice');
-            } else {
-                presentEvent(nextEvent.id);
-            }
+            presentEvent(nextEvent.id);
         }, 500);
     }
 
