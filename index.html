@@ -24,7 +24,7 @@
     <div id="start-screen" class="min-h-screen flex flex-col items-center justify-center p-4 text-center">
         <div class="max-w-2xl">
             <h1 class="text-4xl md:text-5xl font-bold text-white">Karriere-Navigator <span class="finn-gradient text-transparent bg-clip-text">AI</span></h1>
-            <p class="mt-4 text-lg text-slate-400">Triff die Finanzentscheidungen deines Lebens – mit einem KI-Mentor an deiner Seite. Das Spiel läuft in 3-Jahres-Schritten. Dein Ziel: Erreiche finanzielle Freiheit bis zur Pension.</p>
+            <p class="mt-4 text-lg text-slate-400">Triff die Finanzentscheidungen deines Lebens – mit einem KI-Mentor an deiner Seite. Das Spiel läuft in jährlichen Schritten. Dein Ziel: Erreiche finanzielle Freiheit bis zur Pension.</p>
         </div>
         <div id="career-choices" class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl"></div>
     </div>
@@ -171,7 +171,7 @@
     };
 
     const events = [
-        { id: 'start', description: "Deine Karriere beginnt. Die nächsten Jahre werden entscheidend sein.", finnAdvice: "Konzentriere dich auf den Aufbau von Wissen und Kapital. Jede Entscheidung zählt.", options: [{ text: "Los geht's!", action: () => nextStep() }] },
+        { id: 'start', description: "Deine Karriere beginnt. Die nächsten Jahre werden entscheidend sein.", finnAdvice: "Konzentriere dich auf den Aufbau von Wissen und Kapital. Jede Entscheidung zählt.", options: [{ text: "Los geht's!", action: () => progressToNextEvent() }] },
         { id: 'education_offer', condition: gs => gs.knowledge < 85 && !gs.triggeredEvents.includes('education_offer'), description: "Dein Arbeitgeber bietet eine Weiterbildung an. Kosten für dich: 5.000 €.", finnAdvice: "Bildung ist die beste Investition. Dies könnte deine Gehaltschancen erheblich verbessern.", options: [{ text: "Investieren", action: () => { gameState.netWorth -= 5000; gameState.knowledge += 15; nextStep(); } }, { text: "Ablehnen", action: () => nextStep() }] },
         { id: 'salary_negotiation', condition: gs => gs.age > 25, description: "Du fühlst dich unterbezahlt und überlegst, eine Gehaltserhöhung zu fordern.", finnAdvice: "Gute Argumente sind entscheidend. Beziehe dich auf deine Erfolge und dein gestiegenes Wissen.", options: [{ text: "Verhandeln", action: () => toggleModal(DOMElements.negotiationModal, true) }, { text: "Warten", action: () => { gameState.stress -= 5; nextStep(); } }] },
         { id: 'work_life_balance', condition: gs => gs.stress > 50 && !gs.triggeredEvents.includes('work_life_balance'), description: "Der Job-Stress macht dir zu schaffen. Du überlegst, deine Arbeitszeit zu reduzieren.", finnAdvice: "Weniger Arbeit bedeutet weniger Gehalt und Pension, aber auch mehr Lebensqualität. Eine schwierige Abwägung.", options: [{ text: "Auf 80% Teilzeit wechseln", action: () => { gameState.workModel = 0.8; gameState.stress -= 20; nextStep(); } }, { text: "Vollzeit weitermachen", action: () => { gameState.stress += 5; nextStep(); } }] },
@@ -194,10 +194,19 @@
             rent: 700,
             history: [],
             triggeredEvents: [],
-            isGameStarted: false
         };
         DOMElements.startScreen.classList.add('hidden');
         DOMElements.gameScreen.classList.remove('hidden');
+        
+        // Record initial state for chart before any time passes
+        const initialFinancials = getAnnualFinancials(gameState);
+        gameState.history.push({
+            age: gameState.age,
+            income: initialFinancials.brutto,
+            pension: gameState.pension,
+            expenses: initialFinancials.expenses
+        });
+
         updateUI();
         presentEvent('start');
     }
@@ -217,14 +226,15 @@
         return { brutto: salary, deductions: totalDeductions, netto: nettoSalary, expenses: totalExpenses, surplus: surplus };
     }
 
-    function advanceStateByThreeYears() {
-        gameState.bruttoSalary *= 1.06;
+    function advanceStateByOneYear() {
+        gameState.age += 1;
+        gameState.bruttoSalary *= 1.02;
         const annual = getAnnualFinancials(gameState);
-        gameState.netWorth += annual.surplus * 3;
+        gameState.netWorth += annual.surplus;
         const pensionContribution = annual.brutto * 0.15;
-        gameState.pension += pensionContribution * 3;
-        gameState.baseLivingCost *= 1.05;
-        gameState.rent *= 1.04;
+        gameState.pension += pensionContribution;
+        gameState.baseLivingCost *= 1.015;
+        gameState.rent *= 1.012;
         
         gameState.history.push({
             age: gameState.age,
@@ -232,8 +242,6 @@
             pension: gameState.pension,
             expenses: annual.expenses
         });
-        
-        gameState.age += 3;
     }
 
     function updateUI() {
@@ -269,26 +277,25 @@
             gameState.triggeredEvents.push(eventId);
         }
     }
+    
+    function progressToNextEvent() {
+         const availableEvents = events.filter(e => e.id !== 'start' && (!e.condition || e.condition(gameState)));
+        const nextEvent = availableEvents.length > 0 ? availableEvents[Math.floor(Math.random() * availableEvents.length)] : events.find(e => e.id === 'salary_negotiation');
+        presentEvent(nextEvent.id);
+    }
 
     function nextStep() {
-        if (!gameState.isGameStarted) {
-            gameState.isGameStarted = true;
-        }
-
         if (gameState.age >= 65) {
             endGame();
             return;
         }
 
-        advanceStateByThreeYears();
+        advanceStateByOneYear();
         updateUI();
 
-        const availableEvents = events.filter(e => e.id !== 'start' && (!e.condition || e.condition(gameState)));
-        const nextEvent = availableEvents.length > 0 ? availableEvents[Math.floor(Math.random() * availableEvents.length)] : events.find(e => e.id === 'salary_negotiation');
-        
         setTimeout(() => {
             if (gameState.age < 65) {
-                presentEvent(nextEvent.id);
+                progressToNextEvent();
             } else {
                 endGame();
             }
